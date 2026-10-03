@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 import com.dhwl.careerforge.dto.UserCreateRequest;
 import com.dhwl.careerforge.dto.UserResponse;
 import com.dhwl.careerforge.entity.User;
+import com.dhwl.careerforge.exception.EmailAlreadyExistsException;
+import com.dhwl.careerforge.exception.UserNotFoundException;
 import com.dhwl.careerforge.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -20,7 +22,7 @@ public class UserService {
     public UserResponse createUser(UserCreateRequest request) {
 
         if (emailExists(request.getEmail())) {
-            throw new RuntimeException("Email already exists!");
+            throw new EmailAlreadyExistsException("Email already exists!");
         }
 
         User user = toEntity(request);
@@ -61,7 +63,7 @@ public class UserService {
     public UserResponse getUserById(Long id) {
 
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found!"));
+                .orElseThrow(() -> new UserNotFoundException("User not found!"));
 
         return toResponse(user);
     }

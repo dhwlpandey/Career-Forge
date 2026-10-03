@@ -55,4 +55,18 @@ public class User {
     )
     private Set<Skill> skills = new HashSet<>();
 
+    public void setProfile(Profile profile) {
+        this.profile = profile;
+
+        if (profile != null && profile.getUser() != this) {
+            profile.setUser(this);
+        }
+    }
+
+    public void removeProfile() {
+        if (this.profile != null) {
+            this.profile.setUser(null);
+            this.profile = null;
+        }
+    }
 }

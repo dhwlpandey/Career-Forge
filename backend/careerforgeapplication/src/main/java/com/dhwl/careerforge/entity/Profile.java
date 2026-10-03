@@ -46,4 +46,19 @@ public class Profile {
     @OneToOne 
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
+
+    public void setUser(User user) {
+        this.user = user;
+
+        if (user != null && user.getProfile() != this) {
+            user.setProfile(this);
+        }
+    }
+
+    public void removeUser() {
+        if (this.user != null) {
+            this.user.setProfile(null);
+            this.user = null;
+        }
+    }
 }
