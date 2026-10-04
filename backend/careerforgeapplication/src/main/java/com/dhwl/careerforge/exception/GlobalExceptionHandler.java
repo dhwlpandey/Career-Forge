@@ -47,4 +47,16 @@ public class GlobalExceptionHandler {
         
         return ex.getMessage();
     }
+
+    @ExceptionHandler(SkillAlreadyExistsException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public String handleSkillAlreadyExists(SkillAlreadyExistsException ex) {
+        return ex.getMessage();
+    }
+
+    @ExceptionHandler(SkillNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public String handleSkillNotFound(SkillNotFoundException ex) {
+        return ex.getMessage();
+    }
 }
