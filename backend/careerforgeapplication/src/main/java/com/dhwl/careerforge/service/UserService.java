@@ -3,12 +3,16 @@ package com.dhwl.careerforge.service;
 import java.time.LocalDateTime;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.dhwl.careerforge.dto.UserCreateRequest;
 import com.dhwl.careerforge.dto.UserResponse;
+import com.dhwl.careerforge.dto.UserUpdateRequest;
+import com.dhwl.careerforge.entity.Profile;
 import com.dhwl.careerforge.entity.User;
 import com.dhwl.careerforge.exception.EmailAlreadyExistsException;
 import com.dhwl.careerforge.exception.UserNotFoundException;
+import com.dhwl.careerforge.repository.ProfileRepository;
 import com.dhwl.careerforge.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -18,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final ProfileRepository profileRepository;
 
     public UserResponse createUser(UserCreateRequest request) {
 
@@ -73,4 +78,41 @@ public class UserService {
         return userRepository.existsByEmail(email);
     }
 
+    public UserResponse updateUser(Long id, UserUpdateRequest request) {
+
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        if (userRepository.existsByEmailAndIdNot(request.getEmail(), id)) {
+            throw new EmailAlreadyExistsException("Email already exists");
+        }
+
+        user.setName(request.getName());
+        user.setEmail(request.getEmail());
+
+        user.setUpdatedAt(LocalDateTime.now());
+
+        User updatedUser = userRepository.save(user);
+
+        return toResponse(updatedUser);
+    }
+
+    @Transactional 
+    public void deleteUser(Long id) {
+
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        Profile profile = user.getProfile();
+
+        if (profile != null) {
+            user.removeProfile();
+            profileRepository.delete(profile);
+        }
+
+        user.getSkills().clear();
+
+        userRepository.delete(user);
+
+    }
 }
