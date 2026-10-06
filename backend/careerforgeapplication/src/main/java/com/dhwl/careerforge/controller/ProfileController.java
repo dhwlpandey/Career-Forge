@@ -24,11 +24,11 @@ public class ProfileController {
 
     private final ProfileService profileService;
 
-    @PostMapping 
-    public ProfileResponse createProfile (@RequestBody ProfileCreateRequest request) {
+    // @PostMapping 
+    // public ProfileResponse createProfile (@RequestBody ProfileCreateRequest request) {
 
-        return profileService.createProfile(request);
-    }
+    //     return profileService.createProfile(request);
+    // }
 
     @GetMapping("/{id}")
     public ProfileResponse getProfileById (@PathVariable Long id) {

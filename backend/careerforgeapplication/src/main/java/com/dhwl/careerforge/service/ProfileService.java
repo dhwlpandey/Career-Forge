@@ -24,10 +24,10 @@ public class ProfileService {
 
     private final UserRepository userRepository;
 
-    public ProfileResponse createProfile(ProfileCreateRequest request) {
+    public ProfileResponse createProfile(User user, ProfileCreateRequest request) {
 
-        User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
+        // User usr = userRepository.findById(user.getId())
+        //         .orElseThrow(() -> new UserNotFoundException("User not found"));
 
         Profile profile = new Profile();
 

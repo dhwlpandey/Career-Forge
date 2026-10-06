@@ -9,8 +9,6 @@ import lombok.Setter;
 @NoArgsConstructor 
 public class ProfileCreateRequest {
 
-    private Long userId;
-
     private String phone;
     
     private String location;
