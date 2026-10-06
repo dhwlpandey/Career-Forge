@@ -1,5 +1,6 @@
 package com.dhwl.careerforge.exception;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,60 +11,121 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.dhwl.careerforge.dto.ErrorResponse;
+
 @RestControllerAdvice 
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(UserNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public String handleUserNotFound(UserNotFoundException ex) {
-        
-        return ex.getMessage();
+    public ErrorResponse handleUserNotFound(
+            UserNotFoundException ex) {
+
+        return new ErrorResponse(
+                404,
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Map<String, String> handleValidationErrors (MethodArgumentNotValidException ex) {
+    public ErrorResponse handleValidationErrors(
+            MethodArgumentNotValidException ex) {
 
-        Map <String, String> errors = new HashMap<>();
+        Map<String, String> errors = new HashMap<>();
 
         ex.getBindingResult()
                 .getFieldErrors()
-                .forEach(error -> 
-                    errors.put(error.getField(), error.getDefaultMessage())
+                .forEach(error ->
+                        errors.put(
+                                error.getField(),
+                                error.getDefaultMessage()
+                        )
                 );
 
-        return errors;
+        ErrorResponse response = new ErrorResponse(
+                400,
+                "Validation failed",
+                LocalDateTime.now()
+        );
+
+        response.setErrors(errors);
+
+        return response;
     }
 
     @ExceptionHandler(EmailAlreadyExistsException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
-    public String handleEmailAlreadyExists(EmailAlreadyExistsException ex) {
+    public ErrorResponse handleEmailAlreadyExists(
+            EmailAlreadyExistsException ex) {
 
-        return ex.getMessage();
+        return new ErrorResponse(
+                409,
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
     }
 
     @ExceptionHandler(ProfileNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public String handleProfileNotFound(ProfileNotFoundException ex) {
-        
-        return ex.getMessage();
+    public ErrorResponse handleProfileNotFound(
+            ProfileNotFoundException ex) {
+
+        return new ErrorResponse(
+                404,
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
     }
 
     @ExceptionHandler(SkillAlreadyExistsException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
-    public String handleSkillAlreadyExists(SkillAlreadyExistsException ex) {
-        return ex.getMessage();
+    public ErrorResponse handleSkillAlreadyExists(
+            SkillAlreadyExistsException ex) {
+
+        return new ErrorResponse(
+                409,
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
     }
 
     @ExceptionHandler(SkillNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public String handleSkillNotFound(SkillNotFoundException ex) {
-        return ex.getMessage();
+    public ErrorResponse handleSkillNotFound(
+            SkillNotFoundException ex) {
+
+        return new ErrorResponse(
+                404,
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
     }
 
     @ExceptionHandler(BadCredentialsException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public String handleBadCredentials(BadCredentialsException ex) {
-        return "Invalid email or password";
+    public ErrorResponse handleBadCredentials(
+            BadCredentialsException ex) {
+
+        return new ErrorResponse(
+                401,
+                "Invalid email or password",
+                LocalDateTime.now()
+        );
     }
+
+    @ExceptionHandler(ProfileAlreadyExistsException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorResponse handleProfileAlreadyExists(
+            ProfileAlreadyExistsException ex) {
+
+        return new ErrorResponse(
+                409,
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+    }
+
+
 }

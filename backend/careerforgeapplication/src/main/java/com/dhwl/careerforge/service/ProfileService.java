@@ -9,6 +9,7 @@ import com.dhwl.careerforge.dto.ProfileCreateRequest;
 import com.dhwl.careerforge.dto.ProfileResponse;
 import com.dhwl.careerforge.entity.Profile;
 import com.dhwl.careerforge.entity.User;
+import com.dhwl.careerforge.exception.ProfileAlreadyExistsException;
 import com.dhwl.careerforge.exception.ProfileNotFoundException;
 import com.dhwl.careerforge.exception.UserNotFoundException;
 import com.dhwl.careerforge.repository.ProfileRepository;
@@ -22,12 +23,16 @@ public class ProfileService {
 
     private final ProfileRepository profileRepository;
 
-    private final UserRepository userRepository;
+    // private final UserRepository userRepository;
 
     public ProfileResponse createProfile(User user, ProfileCreateRequest request) {
 
         // User usr = userRepository.findById(user.getId())
         //         .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        if (profileRepository.findByUserId(user.getId()).isPresent()) {
+            throw new ProfileAlreadyExistsException("Profile already exists");
+        }
 
         Profile profile = new Profile();
 
@@ -65,17 +70,9 @@ public class ProfileService {
         return response;
     }
 
-    public ProfileResponse getProfileById(Long id) {
-        
-        Profile profile = profileRepository.findById(id)
-            .orElseThrow(() -> new ProfileNotFoundException("Profile not found"));
+    public ProfileResponse updateCurrentProfile (User user, ProfileCreateRequest request) {
 
-        return toResponse(profile);
-    }
-
-    public ProfileResponse updateProfile (Long id, ProfileCreateRequest request) {
-
-        Profile profile = profileRepository.findById(id)
+        Profile profile = profileRepository.findByUserId(user.getId())
                 .orElseThrow(() -> new ProfileNotFoundException("Profile not found!"));
                
         profile.setPhone(request.getPhone());
@@ -92,13 +89,22 @@ public class ProfileService {
     }
     
     @Transactional 
-    public void deleteProfile(Long id) {
+    public void deleteCurrentProfile(User user) {
 
-        Profile profile = profileRepository.findById(id)
+        Profile profile = profileRepository.findByUserId(user.getId())
                 .orElseThrow(() -> new ProfileNotFoundException("Profile not found!"));
 
         profile.removeUser();
 
         profileRepository.delete(profile);
+    }
+
+    public ProfileResponse getCurrentProfile(User user) {
+
+        Profile profile = profileRepository
+                .findByUserId(user.getId())
+                .orElseThrow(() -> new ProfileNotFoundException("Profile not found!"));
+
+        return toResponse(profile); 
     }
 }

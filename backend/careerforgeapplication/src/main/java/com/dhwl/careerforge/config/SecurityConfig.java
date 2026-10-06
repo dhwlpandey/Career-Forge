@@ -15,6 +15,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import com.dhwl.careerforge.security.JwtAuthenticationFilter;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
 @Configuration 
@@ -49,6 +50,13 @@ public class SecurityConfig {
                                     HttpStatus.UNAUTHORIZED
                             )
                     )
+                     .accessDeniedHandler(
+                        (request, response, accessDeniedException) ->
+                        response.sendError(
+                                HttpServletResponse.SC_FORBIDDEN,
+                                "Access denied"
+                        )
+                )
                 )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()

@@ -23,11 +23,16 @@ public class AuthenticatedUserService {
             throw new IllegalStateException(
                     "No authenticated user found"
             );
-        }
+                    }
                         
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
 
         return userDetails.getUser();
+    }
+
+    public Long getCurrentUserId () {
+
+        return getCurrentUser().getId();
     }
 
 }

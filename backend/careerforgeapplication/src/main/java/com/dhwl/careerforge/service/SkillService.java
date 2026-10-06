@@ -3,6 +3,7 @@ package com.dhwl.careerforge.service;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.dhwl.careerforge.dto.SkillCreateRequest;
 import com.dhwl.careerforge.dto.SkillResponse;
@@ -64,11 +65,12 @@ public class SkillService {
                 .toList();
     }
 
-    public void addSkillToUser(Long userId, Long skillId) {
+    @Transactional 
+    public void addSkillToCurrentUser(Long userId, Long skillId) {
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() ->
-                        new UserNotFoundException("User not found"));
+            .orElseThrow(() ->
+                    new UserNotFoundException("User not found"));
 
         Skill skill = skillRepository.findById(skillId)
                 .orElseThrow(() ->
@@ -79,11 +81,12 @@ public class SkillService {
         userRepository.save(user);
     }
 
-    public List<SkillResponse> getUserSkills(Long userId) {
+    @Transactional(readOnly = true)
+    public List<SkillResponse> getCurrentUserSkills(Long userId) {
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() ->
-                        new UserNotFoundException("User not found"));
+            .orElseThrow(() ->
+                    new UserNotFoundException("User not found"));
 
         return user.getSkills()
                 .stream()
@@ -91,11 +94,12 @@ public class SkillService {
                 .toList();
     }
 
-    public void removeSkillFromUser(Long userId, Long skillId) {
+    @Transactional 
+    public void removeSkillFromCurrentUser(Long userId, Long skillId) {
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() ->
-                        new UserNotFoundException("User not found"));
+            .orElseThrow(() ->
+                    new UserNotFoundException("User not found"));
 
         Skill skill = skillRepository.findById(skillId)
                 .orElseThrow(() ->

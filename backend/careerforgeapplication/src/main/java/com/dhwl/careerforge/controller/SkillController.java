@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.dhwl.careerforge.dto.SkillCreateRequest;
 import com.dhwl.careerforge.dto.SkillResponse;
+import com.dhwl.careerforge.entity.User;
+import com.dhwl.careerforge.security.AuthenticatedUserService;
 import com.dhwl.careerforge.service.SkillService;
 
 import jakarta.validation.Valid;
@@ -25,6 +27,8 @@ import lombok.RequiredArgsConstructor;
 public class SkillController {
 
     private final SkillService skillService;
+
+    private final AuthenticatedUserService authenticatedUserService;
 
     @PostMapping
     public SkillResponse createSkill(
@@ -46,28 +50,29 @@ public class SkillController {
         return skillService.getAllSkills();
     }
 
-    @PostMapping("/users/{userId}/skills/{skillId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void addSkillToUser(
-            @PathVariable Long userId,
-            @PathVariable Long skillId) {
+    @GetMapping("/me")
+    public List<SkillResponse> getCurrentUserSkills() {
 
-        skillService.addSkillToUser(userId, skillId);
+        Long currentUserId = authenticatedUserService.getCurrentUserId();
+
+        return skillService.getCurrentUserSkills(currentUserId);
     }
 
-    @GetMapping("/users/{userId}/skills")
-    public List<SkillResponse> getUserSkills(
-            @PathVariable Long userId) {
+    @PostMapping("/me/{skillId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void addSkillToCurrentUser(@PathVariable Long skillId) {
 
-        return skillService.getUserSkills(userId);
+        Long currentUserId = authenticatedUserService.getCurrentUserId();
+
+        skillService.addSkillToCurrentUser(currentUserId,skillId);
     }
 
-    @DeleteMapping("/users/{userId}/skills/{skillId}")
+    @DeleteMapping("/me/{skillId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void removeSkillFromUser(
-            @PathVariable Long userId,
-            @PathVariable Long skillId) {
+    public void removeSkillFromCurrentUser(@PathVariable Long skillId) {
 
-        skillService.removeSkillFromUser(userId, skillId);
+        Long currentUserId = authenticatedUserService.getCurrentUserId();
+
+        skillService.removeSkillFromCurrentUser(currentUserId,skillId);
     }
 }
