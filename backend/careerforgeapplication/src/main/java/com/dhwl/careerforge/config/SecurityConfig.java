@@ -45,24 +45,25 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .exceptionHandling(exception -> exception
-                    .authenticationEntryPoint(
-                            new HttpStatusEntryPoint(
-                                    HttpStatus.UNAUTHORIZED
-                            )
-                    )
-                     .accessDeniedHandler(
-                        (request, response, accessDeniedException) ->
-                        response.sendError(
-                                HttpServletResponse.SC_FORBIDDEN,
-                                "Access denied"
+                        .authenticationEntryPoint((request, response, authException) -> {
+                                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                                response.getWriter().write("Authentication required");
+                        })
+                        .accessDeniedHandler((request, response, accessDeniedException) -> {
+                                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                                response.getWriter().write("Access denied");
+                        })
                         )
-                )
-                )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
+                        // Admin-only endpoints
+                        .requestMatchers("/api/admin-test").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/jobs/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/jobs/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/jobs/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
-                )
+                        )
                 .addFilterBefore(
                         jwtAuthenticationFilter,
                         UsernamePasswordAuthenticationFilter.class    

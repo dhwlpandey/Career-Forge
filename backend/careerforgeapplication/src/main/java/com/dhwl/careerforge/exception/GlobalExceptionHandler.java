@@ -127,5 +127,16 @@ public class GlobalExceptionHandler {
         );
     }
 
+    @ExceptionHandler(JobNotFoundException.class)
+        @ResponseStatus(HttpStatus.NOT_FOUND)
+        public ErrorResponse handleJobNotFound(
+                JobNotFoundException ex) {
+
+        return new ErrorResponse(
+                404,
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+        }
 
 }

@@ -64,6 +64,11 @@ public class UserController {
         return userService.createUser(request);
     }
 
+    // @GetMapping("/api/admin-test")
+    // public String adminTest() {
+    //     return "Admin access granted";
+    // }
+
     // @GetMapping("api/users/{id}")
     // public UserResponse getUserById(@PathVariable Long id) {
 

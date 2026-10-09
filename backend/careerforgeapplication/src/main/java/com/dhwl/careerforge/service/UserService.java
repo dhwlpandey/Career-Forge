@@ -10,6 +10,7 @@ import com.dhwl.careerforge.dto.UserCreateRequest;
 import com.dhwl.careerforge.dto.UserResponse;
 import com.dhwl.careerforge.dto.UserUpdateRequest;
 import com.dhwl.careerforge.entity.Profile;
+import com.dhwl.careerforge.entity.Role;
 import com.dhwl.careerforge.entity.User;
 import com.dhwl.careerforge.exception.EmailAlreadyExistsException;
 import com.dhwl.careerforge.exception.UserNotFoundException;
@@ -51,6 +52,7 @@ public class UserService {
         user.setName(request.getName());
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setRole(Role.USER);
 
         return user;
     }
