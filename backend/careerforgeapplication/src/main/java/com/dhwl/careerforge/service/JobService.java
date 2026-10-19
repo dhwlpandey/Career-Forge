@@ -120,8 +120,8 @@ public class JobService {
     }
 
     public Page<JobResponse> getAllJobs(Pageable pageable) {
-
-        return jobRepository.findAll(pageable)
+        return jobRepository
+                .findAll(JobSpecification.isActive(), pageable)
                 .map(this::toResponse);
     }
 
@@ -129,13 +129,17 @@ public class JobService {
         String keyword,
         Pageable pageable) {
 
+        Specification<Job> specification =
+                JobSpecification.isActive();
+
+        if (keyword != null && !keyword.isBlank()) {
+            specification = specification.and(
+                    JobSpecification.hasKeyword(keyword)
+            );
+        }
+
         return jobRepository
-                .findByTitleContainingIgnoreCaseOrCompanyNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(
-                        keyword,
-                        keyword,
-                        keyword,
-                        pageable
-                )
+                .findAll(specification, pageable)
                 .map(this::toResponse);
     }
 

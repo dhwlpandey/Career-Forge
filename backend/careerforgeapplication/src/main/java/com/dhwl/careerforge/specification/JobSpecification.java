@@ -42,4 +42,25 @@ public class JobSpecification {
         return (root, query, criteriaBuilder) ->
                 criteriaBuilder.isTrue(root.get("isActive"));
     }
+    
+    public static Specification<Job> hasKeyword(String keyword) {
+        return (root, query, criteriaBuilder) -> {
+                String pattern = "%" + keyword.toLowerCase().trim() + "%";
+
+                return criteriaBuilder.or(
+                        criteriaBuilder.like(
+                                criteriaBuilder.lower(root.get("title")),
+                                pattern
+                        ),
+                        criteriaBuilder.like(
+                                criteriaBuilder.lower(root.get("companyName")),
+                                pattern
+                        ),
+                        criteriaBuilder.like(
+                                criteriaBuilder.lower(root.get("description")),
+                                pattern
+                        )
+                );
+        };
+        }
 }
