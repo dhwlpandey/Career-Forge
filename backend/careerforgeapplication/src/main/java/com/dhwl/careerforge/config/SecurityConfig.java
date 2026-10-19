@@ -62,6 +62,10 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/jobs/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/jobs/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/jobs/**").hasRole("ADMIN")
+                        .requestMatchers(
+                                "/api/applications/admin",
+                                "/api/applications/admin/**"
+                        ).hasRole("ADMIN")
                         .anyRequest().authenticated()
                         )
                 .addFilterBefore(

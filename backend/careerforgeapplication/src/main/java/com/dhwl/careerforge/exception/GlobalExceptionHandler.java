@@ -139,4 +139,39 @@ public class GlobalExceptionHandler {
         );
         }
 
+        @ExceptionHandler(ApplicationAlreadyExistsException.class)
+        @ResponseStatus(HttpStatus.CONFLICT)
+        public ErrorResponse handleApplicationAlreadyExists(
+                ApplicationAlreadyExistsException ex) {
+
+        return new ErrorResponse(
+                409,
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+        }
+
+        @ExceptionHandler(ApplicationNotFoundException.class)
+        @ResponseStatus(HttpStatus.NOT_FOUND)
+        public ErrorResponse handleApplicationNotFound(
+                ApplicationNotFoundException ex) {
+
+        return new ErrorResponse(
+                404,
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+        }
+
+        @ExceptionHandler(InvalidApplicationStateException.class)
+        @ResponseStatus(HttpStatus.CONFLICT)
+        public ErrorResponse handleInvalidApplicationState(
+                InvalidApplicationStateException ex) {
+
+        return new ErrorResponse(
+                409,
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+        }
 }
