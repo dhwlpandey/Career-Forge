@@ -92,6 +92,30 @@ public class ApplicationService {
         return response;
     }
 
+    private boolean isValidStatusTransition(
+        ApplicationStatus current,
+        ApplicationStatus next) {
+
+        return switch (current) {
+                case APPLIED ->
+                        next == ApplicationStatus.SHORTLISTED
+                        || next == ApplicationStatus.INTERVIEW
+                        || next == ApplicationStatus.SELECTED
+                        || next == ApplicationStatus.REJECTED;
+
+                case SHORTLISTED ->
+                        next == ApplicationStatus.INTERVIEW
+                        || next == ApplicationStatus.SELECTED
+                        || next == ApplicationStatus.REJECTED;
+
+                case INTERVIEW ->
+                        next == ApplicationStatus.SELECTED
+                        || next == ApplicationStatus.REJECTED;
+
+                case SELECTED, REJECTED, WITHDRAWN -> false;
+        };
+        }
+
     @Transactional(readOnly = true)
     public Page<ApplicationResponse> getMyApplications(Pageable pageable) {
 
@@ -132,9 +156,9 @@ public class ApplicationService {
                         ));
 
         if (application.getStatus() == ApplicationStatus.WITHDRAWN) {
-            throw new IllegalStateException(
-                    "A withdrawn application cannot be updated"
-            );
+                throw new InvalidApplicationStateException(
+                        "A withdrawn application cannot be updated"
+                );
         }
 
         application.setCoverLetter(request.getCoverLetter());
@@ -205,12 +229,10 @@ public class ApplicationService {
                 );
         }
 
-        if (currentStatus == ApplicationStatus.WITHDRAWN
-                || currentStatus == ApplicationStatus.SELECTED
-                || currentStatus == ApplicationStatus.REJECTED) {
-
+        if (!isValidStatusTransition(currentStatus, newStatus)) {
                 throw new InvalidApplicationStateException(
-                        "Application status can no longer be changed"
+                        "Invalid application status transition from "
+                                + currentStatus + " to " + newStatus
                 );
         }
 

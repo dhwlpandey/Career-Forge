@@ -401,4 +401,28 @@ class ApplicationServiceTest {
                 () -> applicationService.getMyApplicationById(999L)
         );
         }
+
+        @Test
+        void updateMyApplication_shouldRejectWithdrawnApplication() {
+        Application application = new Application();
+        application.setId(50L);
+        application.setUser(user);
+        application.setJob(job);
+        application.setStatus(ApplicationStatus.WITHDRAWN);
+
+        ApplicationUpdateRequest request = new ApplicationUpdateRequest();
+        request.setCoverLetter("Updated cover letter");
+        request.setNotes("Updated notes");
+
+        when(authenticatedUserService.getCurrentUser()).thenReturn(user);
+        when(applicationRepository.findByIdAndUserId(50L, 1L))
+                .thenReturn(Optional.of(application));
+
+        assertThrows(
+                InvalidApplicationStateException.class,
+                () -> applicationService.updateMyApplication(50L, request)
+        );
+
+        verify(applicationRepository, never()).save(any(Application.class));
+        }
 }
